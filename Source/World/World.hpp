@@ -1,14 +1,20 @@
 #pragma once
 
-#include "GUI/GUI.hpp"
+#include <deque>
+
+#include "IsometricPlane.hpp"
 
 namespace dty {
-	class World : public GUI {
+	class World : public GUIBase {
 	public:
-		using GUI::GUI;
+		using GUIBase::GUIBase;
 
 		void Update() override;
-	private:
+		void Initialize() override;
 
+		Ref<IsometricPlane> isometricPlane;
+	private:
+		Ref<WorldFileIO> worldFile;
+		double worldMoveSpeed = 250.0;
 	};
 }

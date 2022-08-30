@@ -2,10 +2,12 @@
 
 #include <olcPixelGameEngine.h>
 #include <unordered_map>
+#include <vector>
 
 #include "Miscellaneous/Configuration.hpp"
 #include "Miscellaneous/Memory.hpp"
-#include "World/World.hpp"
+#include "GUI/SpriteLoader.hpp"
+#include "GUI/GUIBase.hpp"
 
 namespace dty {
 	enum class GUILayer {
@@ -28,15 +30,22 @@ namespace dty {
 		bool OnUserUpdate(float) override;
 		bool OnUserCreate() override;
 		void Lifetime();
+		void Initialize();
 
 		olc::PixelGameEngine& getPGE();
 
 		Configuration config;
+		Ref<SpriteLoader> spriteLoader;
+		std::vector<uint32_t> renderLayers = { 0 };
 	private:
 		/*
 			A GUI layer is any class which inherits from GUI.
 			A GUILayer is just a key to signify a specific layer.
 		*/
-		std::unordered_map<GUILayer, Ref<GUI>> guiLayers;
+		std::unordered_map<GUILayer, Ref<GUIBase>> guiLayers;
+
+
+		// TODO: Create a game state. This will hold the currently selected power,
+		//       loaded sprites, and whatever else.
 	};
 }

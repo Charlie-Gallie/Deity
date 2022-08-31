@@ -3,6 +3,7 @@
 #include <deque>
 
 #include "Miscellaneous/WorldFileIO.hpp"
+#include "Miscellaneous/Matrix.hpp"
 #include "Miscellaneous/Memory.hpp"
 #include "GUI/GUIBase.hpp"
 #include "GUI/Sprite.hpp"

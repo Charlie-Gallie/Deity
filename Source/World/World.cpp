@@ -17,6 +17,7 @@ namespace dty {
 		std::string worldPath = deity.config.assetsFolder + deity.config.worldFile;
 
 		worldFile = CreateRef<WorldFileIO>();
+		worldFile->LoadTiles("t"); // Load tiles by token "t"
 		if (!worldFile->Open(worldPath))
 			std::cout << "Cannot open file" << std::endl;
 

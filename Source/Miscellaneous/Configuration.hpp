@@ -16,6 +16,7 @@ namespace dty {
 		Vector2u baseTileSize = { 64, 32 };
 		std::string
 			assetsFolder = "Assets/",
-			worldFile = "World.dty";
+			worldFile = "World.dty",
+			tileToken = "tile";
 	};
 }

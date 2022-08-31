@@ -1,7 +1,10 @@
 #include "SpriteLoader.hpp"
 
+#include "GUI/Sprite.hpp"
+
 namespace dty {
 	void SpriteLoader::Initalize() {
+		spritePaths[SpriteName::NO_SPRITE] = "Assets/No_Sprite.png";
 		spritePaths[SpriteName::GRASS_1] = "Assets/Grass_1.png";
 		spritePaths[SpriteName::GRASS_2] = "Assets/Grass_2.png";
 		spritePaths[SpriteName::TREE_1] = "Assets/Tree_1.png";
@@ -21,5 +24,9 @@ namespace dty {
 
 	Ref<olc::Decal> SpriteLoader::GetOLCDecal(SpriteName _spriteName) {
 		return sprites[_spriteName].decal;
+	}
+
+	void SpriteLoader::LoadIntoDecal(Ref<olc::Decal>& _decal, SpriteName _spriteName) {
+		_decal = sprites[_spriteName].decal;
 	}
 }

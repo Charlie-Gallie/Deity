@@ -6,14 +6,19 @@
 #include <stdio.h>
 
 #include "Miscellaneous/Memory.hpp"
-#include "GUI/Sprite.hpp"
 
 namespace dty {
+	class Sprite;
+
 	enum class SpriteName {
+		NO_SPRITE = 0,
+
 		GRASS_1,
 		GRASS_2,
 
-		TREE_1
+		TREE_1,
+
+		SIZE
 	};
 
 	struct SpriteDecalPair {
@@ -27,6 +32,7 @@ namespace dty {
 		
 		void Initalize();
 		Ref<olc::Decal> GetOLCDecal(SpriteName spriteName);
+		void LoadIntoDecal(Ref<olc::Decal>& decal, SpriteName spriteName);
 	private:
 		std::unordered_map<SpriteName, SpriteDecalPair> sprites;
 

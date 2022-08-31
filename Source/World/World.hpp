@@ -2,6 +2,7 @@
 
 #include <deque>
 
+#include "Miscellaneous/Matrix.hpp"
 #include "IsometricPlane.hpp"
 
 namespace dty {

@@ -10,6 +10,7 @@ namespace dty {
 
 	bool Deity::OnUserCreate() {
 		sAppName = config.title;
+
 		Initialize();
 
 		renderLayers.push_back(CreateLayer());
@@ -56,7 +57,7 @@ namespace dty {
 		};
 
 		// Append hotbar and world to GUI layers
-		// Keep hotbar above to draw over the world
+		// Keep hotbar above to draw over the world - This doesn't apply for drawing the decals
 		guiLayers[GUILayer::WORLD] = static_cast<Ref<GUIBase>>(world);
 		guiLayers[GUILayer::HOTBAR] = static_cast<Ref<GUIBase>>(hotbar);
 

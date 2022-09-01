@@ -13,6 +13,7 @@ namespace dty {
 			struct { T width, height; };
 		};
 
+		/*		I forgot the name		*/
 		operator olc::vi2d() {
 			return {
 				(int)x,
@@ -25,6 +26,10 @@ namespace dty {
 				(float)x,
 				(float)y
 			};
+		}
+
+		operator VecType() {
+			return (VecType)*this;
 		}
 
 		/*		Constructors		*/

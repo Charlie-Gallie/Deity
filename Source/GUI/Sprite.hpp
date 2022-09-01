@@ -18,7 +18,6 @@ namespace dty {
 
 		Vector2 position = 0;
 		Vector2u size = 0;
-		SpriteName spriteName = SpriteName::NO_SPRITE;
 
 		std::string path;
 
@@ -32,10 +31,17 @@ namespace dty {
 		}
 
 		void Draw(olc::PixelGameEngine& _pge, Vector2 _position) {
-			if (olcDecal.get() && spriteName != SpriteName::NO_SPRITE) // fix
+			if (olcDecal.get() && currentSprite != SpriteName::NO_SPRITE)
 				_pge.DrawDecal(_position, olcDecal.get());
-			else
-				std::cout << "No valid decal" << std::endl;
+		}
+
+		SpriteName GetCurrentSprite() {
+			return currentSprite;
+		}
+
+		void SetCurrentSprite(SpriteName _spriteName, Ref<SpriteLoader>& _spriteLoader) {
+			currentSprite = _spriteName;
+			_spriteLoader->LoadIntoDecal(olcDecal, currentSprite);
 		}
 
 		Vector2u GetGridPosition() {
@@ -43,6 +49,8 @@ namespace dty {
 		}
 
 	private:
+		SpriteName currentSprite = SpriteName::NO_SPRITE;
+
 		Vector2u gridPosition = 0;
 	};
 }

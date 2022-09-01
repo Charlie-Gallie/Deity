@@ -23,7 +23,7 @@ namespace dty {
 
 		// Alter the grid size prior to calling Initialize()
 		Vector2u gridSize = { 100, 100 };
-		Vector2 gridOffset;
+		Vector2 gridOffset = 0;
 
 		void InitializeWorld(Ref<WorldFileIO> _worldFile);
 		void Initialize() override;
@@ -31,5 +31,13 @@ namespace dty {
 	private:
 		Ref<WorldFileIO> worldFile;
 		std::deque<Ref<Tile>> tiles;
+		Ref<Sprite> hoverSprite = CreateRef<Sprite>();
+
+		void SetTileGround(Ref<Tile>, SpriteName);
+		void SetTileObject(Ref<Tile>, SpriteName);
+
+		void DrawTile(Ref<Tile>);
+		void DrawHoverSprite();
+		void HoveringOverTile(Ref<Tile>);
 	};
 }

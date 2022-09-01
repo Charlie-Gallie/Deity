@@ -18,5 +18,6 @@ namespace dty {
 			assetsFolder = "Assets/",
 			worldFile = "World.dty",
 			tileToken = "tile";
+		olc::Pixel skyColor = olc::Pixel(110, 190, 255);
 	};
 }

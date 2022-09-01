@@ -13,8 +13,12 @@ namespace dty {
 	enum class SpriteName {
 		NO_SPRITE = 0,
 
+		HOVERED,
+
 		GRASS_1,
 		GRASS_2,
+
+		WATER_1,
 
 		TREE_1,
 

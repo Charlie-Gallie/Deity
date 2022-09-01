@@ -6,6 +6,8 @@
 #include <deque>
 #include <regex>
 
+#include "Miscellaneous/Vector2.hpp"
+
 namespace dty {
 	static bool FileExists(const std::string& _path) {
 		FILE* file;
@@ -28,13 +30,52 @@ namespace dty {
 			Open(path);
 		}
 
+		~WorldFileIO() {
+			Close();
+		}
+
 		void LoadTiles(std::string _token) {
-			worldInfo = GetPropertyArray(_token, 3);
+			worldInfo.clear();
+
+			PropertyArray worldSizePropertyArray = GetPropertyArray("s", 2);
+			worldSize = {
+				(uint32_t)worldSizePropertyArray[0][0],
+				(uint32_t)worldSizePropertyArray[0][1]
+			};
+
+			worldInfo = GetPropertyArray(_token, tilePropertyElements);
+		}
+
+		std::deque<int32_t> GetTileElements(Vector2u _tilePosition) {
+			return worldInfo[_tilePosition.y * worldSize.x + _tilePosition.x];
+		}
+
+		void SetTileElements(Vector2u _tilePosition, std::deque<int32_t> _elements) {
+			worldInfo[_tilePosition.y * worldSize.x + _tilePosition.x] = _elements;
+		}
+
+		void Save() {
+			std::ofstream writeFileHandle(path);
+
+			writeFileHandle << "s{" << worldSize.x << "," << worldSize.y << "}\n";
+			writeFileHandle << "p{700,-1200}\n\n";
+
+			for (auto& a : worldInfo) {
+				writeFileHandle << "t{" << a[0] << "," << a[1] << "," << a[2] << "}\n";
+			}
+
+			writeFileHandle.close();
+		}
+
+		void Close() {
+			fileHandle.close();
 		}
 
 		PropertyArray GetPropertyArray(std::string _token, uint32_t _elements) {
 			if (!_elements)
 				return {};
+
+			// Todo: Allocate some space if I can figure out how much will be written
 
 			// Final deque containing all the elements
 			PropertyArray elements;
@@ -103,8 +144,13 @@ namespace dty {
 		}
 	private:
 		std::deque<std::string> fileContents;
-		PropertyArray worldInfo;
 		std::ifstream fileHandle;
 		std::string path = "";
+
+		PropertyArray worldInfo;
+		Vector2u worldSize = 0;
+
+		const std::string tileToken = "t";
+		const uint32_t tilePropertyElements = 3; // The amount of elements in a single world file property, e.g., t{n, n, n}
 	};
 }

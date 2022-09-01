@@ -15,6 +15,7 @@ namespace dty {
 
 		Ref<IsometricPlane> isometricPlane;
 	private:
+		Vector2 mouseDragStartPosition = 0;
 		Ref<WorldFileIO> worldFile;
 		double worldMoveSpeed = 250.0;
 	};

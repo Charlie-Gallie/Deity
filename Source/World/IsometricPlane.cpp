@@ -22,18 +22,13 @@ namespace dty {
 		for (const auto& prop : properties) {
 			Ref<Tile> tile = CreateRef<Tile>();
 
-			tile->ground->spriteName = (SpriteName)prop[0];
-			tile->object->spriteName = (SpriteName)prop[1];
-
-			deity.spriteLoader->LoadIntoDecal(tile->ground->olcDecal, tile->ground->spriteName);
-			deity.spriteLoader->LoadIntoDecal(tile->object->olcDecal, tile->object->spriteName);
-
-			tile->ground->olcDecal = deity.spriteLoader->GetOLCDecal((SpriteName)prop[0]);
+			tile->ground->SetCurrentSprite((SpriteName)prop[0], deity.spriteLoader);
+			tile->object->SetCurrentSprite((SpriteName)prop[1], deity.spriteLoader);
 
 			tile->ground->SetGridPosition({ (uint32_t)x, (uint32_t)y });
 			tile->ground->size = {
-				deity.config.baseTileSize.x,
-				deity.config.baseTileSize.y
+				(uint32_t)tile->ground->olcDecal->sprite->width,
+				(uint32_t)tile->ground->olcDecal->sprite->height
 			};
 
 			tile->object->SetGridPosition({ (uint32_t)x, (uint32_t)y });
@@ -60,56 +55,119 @@ namespace dty {
 	}
 
 	void IsometricPlane::Initialize() {
-		
+		std::cout << "[IsometricPlane] Use InitializeWorld() rather than Initialize()!" << std::endl;
+		// Todo: Load blank world if the world file cannot be loaded correctly
 	}
 
 	void IsometricPlane::Update() {
 		olc::PixelGameEngine& pge = deity.getPGE();
-
-		pge.SetPixelMode(olc::Pixel::ALPHA);
 
 		Vector2i mousePosition = {
 			(int32_t)pge.GetMouseX(),
 			(int32_t)pge.GetMouseY()
 		};
 
-		double viewPadding = 96; // Todo: Find a better way than just adding a buffer
-		for (Ref<Tile> sprite : tiles) {
-			// Get coord of current tile
-			if ( // Get current tile being hovered over - Such a bodge
-				(int32_t)((mousePosition.x - 16) - gridOffset.x > sprite->ground->position.x) &&
-				(int32_t)((mousePosition.x - 16) - gridOffset.x < sprite->ground->position.x + (deity.config.baseTileSize.x * 0.5)) &&
-				(int32_t)((mousePosition.y - 16) - gridOffset.y > sprite->ground->position.y) &&
-				(int32_t)((mousePosition.y - 16) - gridOffset.y < sprite->ground->position.y + deity.config.baseTileSize.y)
-				) {
-				if (pge.GetMouse(olc::Mouse::LEFT).bPressed) {
-					SpriteName tempSprite = sprite->object->spriteName;
+		pge.SetDrawTarget(deity.renderLayers[1]);
+		pge.SetPixelMode(olc::Pixel::ALPHA);
 
-					// vvv Does not work
-					tempSprite = tempSprite == SpriteName::TREE_1 ? SpriteName::NO_SPRITE : SpriteName::TREE_1;
+		pge.Clear(deity.config.skyColor);
 
-					deity.spriteLoader->LoadIntoDecal(sprite->object->olcDecal, tempSprite);
-				}
-				//std::cout << (olc::vi2d)sprite->ground->GetGridPosition() << std::endl;
-			}
-
-			if ( // Cull tiles which cannot be seen
-				sprite->ground->position.x + gridOffset.x + position.x >= (int32_t)(position.x - viewPadding) &&
-				sprite->ground->position.x + gridOffset.x - position.x <= (int32_t)(position.x + size.y + viewPadding) &&
-				sprite->ground->position.y + gridOffset.y + position.y >= (int32_t)(position.y - viewPadding) &&
-				sprite->ground->position.y + gridOffset.y + position.y <= (int32_t)(position.y + size.y + viewPadding)
+		hoverSprite->SetCurrentSprite(SpriteName::NO_SPRITE, deity.spriteLoader);
+		for (Ref<Tile> tile : tiles) {
+			if ( // Check if the cursor is over the tile - Such a bodge
+				(int32_t)((mousePosition.x - 16) - gridOffset.x > tile->ground->position.x) &&
+				(int32_t)((mousePosition.x - 16) - gridOffset.x < tile->ground->position.x + (deity.config.baseTileSize.x * 0.5)) &&
+				(int32_t)((mousePosition.y - 16) - gridOffset.y > tile->ground->position.y) &&
+				(int32_t)((mousePosition.y - 16) - gridOffset.y < tile->ground->position.y + deity.config.baseTileSize.y)
 			) {
-				Vector2 spritePos = sprite->ground->position + gridOffset;
-
-				pge.SetDrawTarget(deity.renderLayers[1]);
-
-				sprite->ground->Draw(pge, spritePos);
-				sprite->object->Draw(pge, spritePos);
-				
-				pge.SetDrawTarget(deity.renderLayers[0]);
+				HoveringOverTile(tile); // Pass the tile the user is hovering
 			}
+
+			DrawTile(tile); // Draw tile
 		}
+		
+		DrawHoverSprite(); // Draw the hovering sprite to indicate which tile you're over
 
 		pge.SetPixelMode(olc::Pixel::NORMAL);
+		pge.SetDrawTarget(deity.renderLayers[0]);
+	}
+
+	void IsometricPlane::DrawTile(Ref<Tile> _tile) {
+		olc::PixelGameEngine& pge = deity.getPGE();
+
+		double viewPadding = 96; // Todo: Find a better way than just adding a buffer
+		if ( // If the tile can be seen (Culling)
+			_tile->ground->position.x + gridOffset.x + position.x >= (int32_t)(position.x - viewPadding) &&
+			_tile->ground->position.x + gridOffset.x - position.x <= (int32_t)(position.x + size.y + viewPadding) &&
+			_tile->ground->position.y + gridOffset.y + position.y >= (int32_t)(position.y - viewPadding) &&
+			_tile->ground->position.y + gridOffset.y + position.y <= (int32_t)(position.y + size.y + viewPadding)
+		) {
+			Vector2 spritePos = _tile->ground->position + gridOffset;
+
+			_tile->ground->Draw(pge, spritePos);
+			_tile->object->Draw(pge, spritePos);
+		}
+	}
+
+	double saveTimer = 0;
+	void IsometricPlane::DrawHoverSprite() {
+		olc::PixelGameEngine& pge = deity.getPGE();
+
+		pge.SetDrawTarget(deity.renderLayers[1]);
+		hoverSprite->Draw(pge, hoverSprite->position + gridOffset);
+		pge.SetDrawTarget(deity.renderLayers[0]);
+
+		if (saveTimer > 0) {
+			pge.DrawString({ (int32_t)position.x + 10, (int32_t)position.y + 10 }, "Saved!", olc::DARK_BLUE, 2U);
+			saveTimer -= pge.GetElapsedTime();
+		}
+	}
+
+	void IsometricPlane::HoveringOverTile(Ref<Tile> _tile) {
+		olc::PixelGameEngine& pge = deity.getPGE();
+
+		hoverSprite->SetGridPosition(_tile->ground->GetGridPosition());
+
+		hoverSprite->SetCurrentSprite(SpriteName::HOVERED, deity.spriteLoader);
+
+		if (pge.GetMouse(olc::Mouse::LEFT).bPressed) {
+			SetTileGround(_tile, SpriteName::GRASS_2);
+			worldFile->SetTileElements(
+				_tile->ground->GetGridPosition(),
+				{
+					(int32_t)_tile->ground->GetCurrentSprite(),
+					(int32_t)_tile->object->GetCurrentSprite(),
+					0
+				}
+			);
+		}
+
+		if (pge.GetMouse(olc::Mouse::RIGHT).bPressed) {
+			SetTileObject(_tile, SpriteName::TREE_1);
+
+			worldFile->SetTileElements(
+				_tile->ground->GetGridPosition(),
+				{
+					(int32_t)_tile->ground->GetCurrentSprite(),
+					(int32_t)_tile->object->GetCurrentSprite(),
+					0
+				}
+			);
+		}
+
+		if (pge.GetKey(olc::ENTER).bPressed) {
+			worldFile->Save();
+			saveTimer = 1.5;
+		}
+	}
+
+	// Todo: Write new tile to WorldFileIO object
+	// E.g., worldFile->SetTileElements(_tile->ground->GetGridPosition(), { (int32_t)_tile->ground->GetCurrentSprite(), 1, 0 });
+	void IsometricPlane::SetTileGround(Ref<Tile> _tile, SpriteName _spriteName) {
+		_tile->ground->SetCurrentSprite(_spriteName, deity.spriteLoader);
+	}
+
+	void IsometricPlane::SetTileObject(Ref<Tile> _tile, SpriteName _spriteName) {
+		_tile->object->SetCurrentSprite(_spriteName, deity.spriteLoader);
 	}
 }

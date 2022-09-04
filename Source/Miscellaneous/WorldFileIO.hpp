@@ -8,6 +8,12 @@
 
 #include "Miscellaneous/Vector2.hpp"
 
+/*
+	The information provided/not provided by the user of this
+	class is inconsistent and should be changed but refactoring
+	will probably take a bit too long.
+*/
+
 namespace dty {
 	static bool FileExists(const std::string& _path) {
 		FILE* file;
@@ -50,8 +56,16 @@ namespace dty {
 			return worldInfo[_tilePosition.y * worldSize.x + _tilePosition.x];
 		}
 
+		std::deque<int32_t> GetTileElements(size_t _index) {
+			return worldInfo[_index];
+		}
+
 		void SetTileElements(Vector2u _tilePosition, std::deque<int32_t> _elements) {
 			worldInfo[_tilePosition.y * worldSize.x + _tilePosition.x] = _elements;
+		}
+
+		void SetTileElements(size_t _index, std::deque<int32_t> _elements) {
+			worldInfo[_index] = _elements;
 		}
 
 		void Save() {

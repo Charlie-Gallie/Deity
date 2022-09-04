@@ -3,6 +3,10 @@
 #include <memory>
 
 namespace dty {
+	// Weak = Weak pointer
+	template<typename T>
+	using Weak = std::weak_ptr<T>;
+
 	// Ref = Reference count pointer
 	template<typename T>
 	using Ref = std::shared_ptr<T>;

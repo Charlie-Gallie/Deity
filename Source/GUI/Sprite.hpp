@@ -39,7 +39,7 @@ namespace dty {
 			return currentSprite;
 		}
 
-		void SetCurrentSprite(SpriteName _spriteName, Ref<SpriteLoader>& _spriteLoader) {
+		void SetCurrentSprite(SpriteName _spriteName, Ref<SpriteLoader> _spriteLoader) {
 			currentSprite = _spriteName;
 			_spriteLoader->LoadIntoDecal(olcDecal, currentSprite);
 		}

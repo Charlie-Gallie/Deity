@@ -4,6 +4,8 @@
 #include <iostream>
 #include <array>
 
+// Somebody who doesn't fully understand matrices
+// shouldn't be writing a class for them.
 namespace dty {
 	template<typename T, int32_t SizeY>
 	struct Matrix1xGeneric {

@@ -31,6 +31,7 @@ namespace dty {
 		bool OnUserCreate() override;
 		void Lifetime();
 		void Initialize();
+		std::unordered_map<GUILayer, Ref<GUIBase>> GetGUILayers();
 
 		olc::PixelGameEngine& getPGE();
 

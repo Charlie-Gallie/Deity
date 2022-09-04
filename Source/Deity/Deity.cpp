@@ -2,7 +2,6 @@
 #include "Deity.hpp"
 
 #include "World/World.hpp"
-#include "Hotbar/Hotbar.hpp"
 
 namespace dty {
 	Deity::Deity() {}
@@ -36,32 +35,35 @@ namespace dty {
 		spriteLoader = CreateRef<SpriteLoader>();
 		spriteLoader->Initalize(); // This will load all of the sprites from file
 
-		Ref<Hotbar> hotbar = CreateRef<Hotbar>(*this);
 		Ref<World> world = CreateRef<World>(*this);
-
-		// Configure hotbar
-		hotbar->position = 0;
-		hotbar->size = {
-			(uint32_t)((config.windowSize.width / 16) * 3),
-			config.windowSize.height
-		};
 
 		// Configure world
 		world->position = {
-			hotbar->size.width,
+			0,
 			0
 		};
 		world->size = {
-			config.windowSize.width - hotbar->size.width,
+			config.windowSize.width,
 			config.windowSize.height
 		};
 
-		// Append hotbar and world to GUI layers
-		// Keep hotbar above to draw over the world - This doesn't apply for drawing the decals
-		guiLayers[GUILayer::WORLD] = static_cast<Ref<GUIBase>>(world);
-		guiLayers[GUILayer::HOTBAR] = static_cast<Ref<GUIBase>>(hotbar);
+		// There was going to be a hotbar for different weather options but I didn't have time
+		// 
+		/*
+			Ref<Hotbar> hotbar = CreateRef<Hotbar>(*this); 
 
-		hotbar->Initialize();
+			hotbar->Initialize();
+			hotbar->position = 0;
+			hotbar->size = {
+				(uint32_t)((config.windowSize.width / 16) * 3),
+				config.windowSize.height
+			};
+
+			guiLayers[GUILayer::HOTBAR] = static_cast<Ref<GUIBase>>(hotbar);
+			hotabr->Initialize();
+		*/
+
+		guiLayers[GUILayer::WORLD] = static_cast<Ref<GUIBase>>(world);
 		world->Initialize();
 	}
 
@@ -72,7 +74,7 @@ namespace dty {
 			1,							// Pixel X scale
 			1,							// Pixel Y scale
 			false,						// Fullscreen enabled
-			false,						// VSync enabled // Todo: Enable this at production
+			true,						// VSync enabled // Todo: Enable this at production
 			false						// Maintain size enabled
 		);
 
@@ -81,5 +83,9 @@ namespace dty {
 
 	olc::PixelGameEngine& Deity::getPGE() {
 		return static_cast<olc::PixelGameEngine&>(*this);
+	}
+
+	std::unordered_map<GUILayer, Ref<GUIBase>> Deity::GetGUILayers() {
+		return guiLayers;
 	}
 }

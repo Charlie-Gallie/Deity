@@ -4,8 +4,7 @@
 #include <iostream>
 #include <array>
 
-// Somebody who doesn't fully understand matrices
-// shouldn't be writing a class for them.
+// I don't know how matricies work
 namespace dty {
 	template<typename T, int32_t SizeY>
 	struct Matrix1xGeneric {
@@ -28,7 +27,7 @@ namespace dty {
 			return rows[_index];
 		}
 
-		// This won't work for anything other than a 2x2 matrix!
+		// What am I doing
 		MatrixType& Invert() {
 			T
 				&a = rows[0][0],
